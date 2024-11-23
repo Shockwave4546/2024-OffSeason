@@ -118,7 +118,7 @@ deployArtifact.jarTask = jar
 wpi.java.configureExecutableTasks(jar)
 wpi.java.configureTestTasks(test)
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
   // Configure string concat to always inline compile
   options.compilerArgs.add '-XDstringConcat=inline'
 }
@@ -128,6 +128,10 @@ kotlin {
     jvmTarget.set(kotlinJvmTarget)
     // https://kotlinlang.org/docs/gradle-configure-project.html#gradle-java-toolchains-support
     jvmToolchain(Integer.valueOf(javaVersion.toString()))
+  }
+
+  compileKotlin {
+    dependsOn.add(tasks.createVersionFile)
   }
 }
 

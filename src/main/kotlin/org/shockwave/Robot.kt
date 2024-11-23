@@ -8,6 +8,7 @@ import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
 import org.littletonrobotics.junction.networktables.NT4Publisher
 import org.littletonrobotics.junction.wpilog.WPILOGWriter
+import org.shockwave.subsystem.swerve.commands.SwerveDriveCommand
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -39,20 +40,20 @@ object Robot : LoggedRobot() {
       }
     }
 
-//    Logger.recordMetadata("MavenGroup", MAVEN_GROUP)
-//    Logger.recordMetadata("MavenName", MAVEN_NAME)
-//    Logger.recordMetadata("BuildDate", BUILD_DATE)
-//    Logger.recordMetadata("GitSHA", GIT_SHA)
-//    Logger.recordMetadata("GitBranch", GIT_BRANCH)
-//    when (DIRTY) {
-//      0 -> Logger.recordMetadata("GitDirty", "All changes committed")
-//      1 -> Logger.recordMetadata("GitDirty", "Uncommitted changes")
-//      else -> Logger.recordMetadata("GitDirty", "Unknown")
-//    }
+    Logger.recordMetadata("MavenGroup", MAVEN_GROUP)
+    Logger.recordMetadata("MavenName", MAVEN_NAME)
+    Logger.recordMetadata("BuildDate", BUILD_DATE)
+    Logger.recordMetadata("GitSHA", GIT_SHA)
+    Logger.recordMetadata("GitBranch", GIT_BRANCH)
+    when (DIRTY) {
+      0 -> Logger.recordMetadata("GitDirty", "All changes committed")
+      1 -> Logger.recordMetadata("GitDirty", "Uncommitted changes")
+      else -> Logger.recordMetadata("GitDirty", "Unknown")
+    }
 
     Logger.start()
-//    RobotContainer.swerve.zeroGyro() // Reset field orientation drive.
-//    RobotContainer.swerve.resetDriveEncoders()
+    RobotContainer.swerve!!.zeroGyro() // Reset field orientation drive.
+    RobotContainer.swerve.resetDriveEncoders()
 
     CommandScheduler.getInstance().onCommandInitialize { command -> Logger.recordOutput("/ActiveCommands/${command.name}", true) }
     CommandScheduler.getInstance().onCommandFinish { command -> Logger.recordOutput("/ActiveCommands/${command.name}", false) }
@@ -76,9 +77,9 @@ object Robot : LoggedRobot() {
   }
 
   override fun autonomousInit() {
-//    CommandScheduler.getInstance().removeDefaultCommand(RobotContainer.swerve)
-//    RobotContainer.swerve.zeroGyro() // Reset field orientation drive.
-//    RobotContainer.swerve.resetDriveEncoders()
+    CommandScheduler.getInstance().removeDefaultCommand(RobotContainer.swerve)
+    RobotContainer.swerve!!.zeroGyro() // Reset field orientation drive.
+    RobotContainer.swerve.resetDriveEncoders()
 //    RobotContainer.autoManager!!.scheduleRoutine()
   }
 
@@ -87,11 +88,11 @@ object Robot : LoggedRobot() {
   }
 
   override fun teleopInit() {
-//    RobotContainer.swerve.defaultCommand = SwerveDriveCommand(
-//      RobotContainer.driverController,
-//      RobotContainer.swerve,
-//      RobotContainer.vision
-//    )
+    RobotContainer.swerve!!.defaultCommand = SwerveDriveCommand(
+      RobotContainer.driverController,
+      RobotContainer.swerve,
+      RobotContainer.vision!!
+    )
   }
 
   override fun teleopPeriodic() {
