@@ -3,12 +3,6 @@ package org.shockwave.subsystem.shooter
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import org.littletonrobotics.junction.Logger
-import org.shockwave.subsystem.shooter.ShooterConstants.Companion.BOT_GAINS
-import org.shockwave.subsystem.shooter.ShooterConstants.Companion.BOT_RPS_PREDICTOR
-import org.shockwave.subsystem.shooter.ShooterConstants.Companion.MAX_RPS
-import org.shockwave.subsystem.shooter.ShooterConstants.Companion.MIN_RPS
-import org.shockwave.subsystem.shooter.ShooterConstants.Companion.TOP_GAINS
-import org.shockwave.subsystem.shooter.ShooterConstants.Companion.TOP_RPS_PREDICTOR
 import org.shockwave.subsystem.vision.VisionSubsystem
 import org.shockwave.utils.TunablePIDF
 
@@ -16,21 +10,21 @@ class ShooterSubsystem(private val shooter: ShooterIO, private val vision: Visio
   private val inputs = ShooterIO.ShooterIOInputs()
   private var desiredState = ShooterState.STOPPED
 
-  private val botPIDF = TunablePIDF("Shooter/Tuning/Bot/", BOT_GAINS)
-  private val topPIDF = TunablePIDF("Shooter/Tuning/Top/", TOP_GAINS)
+  private val botPIDF = TunablePIDF("Shooter/Tuning/Bot/", ShooterConstants.BOT_GAINS)
+  private val topPIDF = TunablePIDF("Shooter/Tuning/Top/", ShooterConstants.TOP_GAINS)
 
   override fun periodic() {
     shooter.updateInputs(inputs)
     Logger.processInputs("Shooter", inputs)
 
     botPIDF.periodic(shooter::setBotPIDF) { value ->
-      val clamped = MathUtil.clamp(value, MIN_RPS, MAX_RPS)
+      val clamped = MathUtil.clamp(value, ShooterConstants.MIN_RPS, ShooterConstants.MAX_RPS)
       shooter.setBottomVelocitySetpoint(clamped)
       this.desiredState = ShooterState("Manual", clamped, this.desiredState.topRPS)
     }
 
     topPIDF.periodic(shooter::setTopPIDF) { value ->
-      val clamped = MathUtil.clamp(value, MIN_RPS, MAX_RPS)
+      val clamped = MathUtil.clamp(value, ShooterConstants.MIN_RPS, ShooterConstants.MAX_RPS)
       shooter.setTopVelocitySetpoint(clamped)
       this.desiredState = ShooterState("Manual", this.desiredState.bottomRPS, clamped)
     }
@@ -49,15 +43,15 @@ class ShooterSubsystem(private val shooter: ShooterIO, private val vision: Visio
       if (distance.isEmpty) return
       this.desiredState = ShooterState(
         "Interpolated",
-        BOT_RPS_PREDICTOR.predict(distance.get()),
-        TOP_RPS_PREDICTOR.predict(distance.get())
+        ShooterConstants.BOT_RPS_PREDICTOR.predict(distance.get()),
+        ShooterConstants.TOP_RPS_PREDICTOR.predict(distance.get())
       )
     } else {
       this.desiredState = state
     }
 
-    val bottomClamped = MathUtil.clamp(desiredState.bottomRPS, MIN_RPS, MAX_RPS)
-    val topClamped = MathUtil.clamp(desiredState.topRPS, MIN_RPS, MAX_RPS)
+    val bottomClamped = MathUtil.clamp(desiredState.bottomRPS, ShooterConstants.MIN_RPS, ShooterConstants.MAX_RPS)
+    val topClamped = MathUtil.clamp(desiredState.topRPS, ShooterConstants.MIN_RPS, ShooterConstants.MAX_RPS)
     shooter.setBottomVelocitySetpoint(bottomClamped)
     shooter.setTopVelocitySetpoint(topClamped)
   }

@@ -5,8 +5,12 @@ import edu.wpi.first.wpilibj2.command.InstantCommand
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import org.shockwave.subsystem.intake.IntakeIOSpark
 import org.shockwave.subsystem.intake.IntakeSubsystem
+import org.shockwave.subsystem.intakepivot.IntakePivotIOSpark
+import org.shockwave.subsystem.intakepivot.IntakePivotSubsystem
 import org.shockwave.subsystem.shooter.ShooterIOSpark
 import org.shockwave.subsystem.shooter.ShooterSubsystem
+import org.shockwave.subsystem.shooterpivot.ShooterPivotIOSpark
+import org.shockwave.subsystem.shooterpivot.ShooterPivotSubsystem
 import org.shockwave.subsystem.swerve.SwerveIOSpark
 import org.shockwave.subsystem.swerve.SwerveSubsystem
 import org.shockwave.subsystem.swerve.commands.ResetFieldCentricDriveCommand
@@ -16,13 +20,13 @@ import org.shockwave.subsystem.vision.VisionIOReal
 import org.shockwave.subsystem.vision.VisionSubsystem
 
 object RobotContainer {
-  val swerve: SwerveSubsystem?
-  val vision: VisionSubsystem?
+  val swerve = SwerveSubsystem(SwerveIOSpark(), GyroIONavX())
+  val vision = VisionSubsystem(VisionIOReal(), swerve)
 
-  //  val wrist: ShooterWristSubsystem?
-//  val arm: IntakeArmSubsystem?
-  val shooter: ShooterSubsystem?
-  val intake: IntakeSubsystem?
+  val shooterPivot = ShooterPivotSubsystem(ShooterPivotIOSpark(), vision)
+  val intakePivot = IntakePivotSubsystem(IntakePivotIOSpark())
+  val shooter = ShooterSubsystem(ShooterIOSpark(), vision)
+  val intake = IntakeSubsystem(IntakeIOSpark())
 //  val led: LEDSubsystem?
 
   val driverController = CommandXboxController(GlobalConstants.DRIVER_CONTROLLER_PORT)
@@ -30,38 +34,14 @@ object RobotContainer {
 //  val autoManager: AutoManager?
 
   init {
-    when (GlobalConstants.ROBOT_TYPE) {
-      RobotType.REAL -> {
-        swerve = SwerveSubsystem(SwerveIOSpark(), GyroIONavX())
-        vision = VisionSubsystem(VisionIOReal(), swerve)
-//        wrist = ShooterWristSubsystem(ShooterWristIOSpark(WristConstants.MOTOR_CAN_ID), vision)
-//        arm = IntakeArmSubsystem(IntakeArmIOSpark(IntakeArmConstants.MOTOR_CAN_ID))
-        shooter = ShooterSubsystem(ShooterIOSpark(), vision)
-        intake = IntakeSubsystem(IntakeIOSpark())
-//        led = LEDSubsystem()
-//        autoManager = AutoManager(swerve, shooter, wrist, arm, intake, vision)
-      }
-
-      RobotType.SIM -> {
-        swerve = null
-        vision = null
-//        wrist = null
-//        arm = null
-        shooter = null
-        intake = null
-//        led = null
-//        autoManager = null
-      }
-    }
-
     configureBindings()
 
     DriverStation.silenceJoystickConnectionWarning(true)
   }
 
   private fun configureBindings() {
-    driverController.a().onTrue(InstantCommand({ swerve!!.toggleAutoAlign() }))
-    driverController.b().onTrue(ResetFieldCentricDriveCommand(swerve!!, vision!!))
+    driverController.a().onTrue(InstantCommand({ swerve.toggleAutoAlign() }))
+    driverController.b().onTrue(ResetFieldCentricDriveCommand(swerve, vision))
     driverController.x().onTrue(InstantCommand({ swerve.toggleX() }, swerve))
     driverController.leftBumper().whileTrue(SetMaxSpeedCommand(swerve, 0.2, 0.2))
     driverController.rightBumper().whileTrue(SetMaxSpeedCommand(swerve, 0.4, 0.4))

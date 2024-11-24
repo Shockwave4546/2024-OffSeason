@@ -52,7 +52,7 @@ object Robot : LoggedRobot() {
     }
 
     Logger.start()
-    RobotContainer.swerve!!.zeroGyro() // Reset field orientation drive.
+    RobotContainer.swerve.zeroGyro() // Reset field orientation drive.
     RobotContainer.swerve.resetDriveEncoders()
 
     CommandScheduler.getInstance().onCommandInitialize { command -> Logger.recordOutput("/ActiveCommands/${command.name}", true) }
@@ -78,7 +78,7 @@ object Robot : LoggedRobot() {
 
   override fun autonomousInit() {
     CommandScheduler.getInstance().removeDefaultCommand(RobotContainer.swerve)
-    RobotContainer.swerve!!.zeroGyro() // Reset field orientation drive.
+    RobotContainer.swerve.zeroGyro() // Reset field orientation drive.
     RobotContainer.swerve.resetDriveEncoders()
 //    RobotContainer.autoManager!!.scheduleRoutine()
   }
@@ -88,10 +88,10 @@ object Robot : LoggedRobot() {
   }
 
   override fun teleopInit() {
-    RobotContainer.swerve!!.defaultCommand = SwerveDriveCommand(
+    RobotContainer.swerve.defaultCommand = SwerveDriveCommand(
       RobotContainer.driverController,
       RobotContainer.swerve,
-      RobotContainer.vision!!
+      RobotContainer.vision
     )
   }
 

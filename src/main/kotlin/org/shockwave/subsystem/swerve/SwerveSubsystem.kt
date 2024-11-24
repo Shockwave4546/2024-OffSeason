@@ -92,12 +92,10 @@ class SwerveSubsystem(private val io: SwerveIO, private val gyro: GyroIO) : Subs
     val rotDelivered = rotSpeed * SwerveConstants.MAX_ANGULAR_SPEED * (if (useConstRotSpeed) SwerveConstants.DEFAULT_ROT_SPEED_MULTIPLIER else rotSpeedMultiplier.get())
 
     val swerveModuleStates = SwerveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(
-      if (fieldRelative) ChassisSpeeds.fromFieldRelativeSpeeds(
-        xSpeedDelivered,
-        ySpeedDelivered,
-        rotDelivered,
-        getHeadingRotation2d()
-      )
+      if (fieldRelative)
+        ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered).apply {
+          toRobotRelativeSpeeds(getHeadingRotation2d())
+        }
       else ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered)
     )
 

@@ -28,8 +28,6 @@ class TunableBoolean(key: String, private val defaultValue: Boolean = false) {
   }
 
   companion object {
-    private const val TABLE_KEY = "Tuning"
-
     fun ifChanged(id: Int, action: (BooleanArray) -> Unit, vararg tunableBooleans: TunableBoolean) =
       tunableBooleans.filter { it.hasChanged(id) }.forEach { _ ->
         action(tunableBooleans.map { it.get() }.toBooleanArray())
