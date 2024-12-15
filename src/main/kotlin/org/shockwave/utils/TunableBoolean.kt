@@ -1,16 +1,16 @@
 package org.shockwave.utils
 
-import org.littletonrobotics.junction.networktables.LoggedDashboardBoolean
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean
 import org.shockwave.GlobalConstants
 import org.shockwave.RobotContainer
 
 class TunableBoolean(key: String, private val defaultValue: Boolean = false) {
-  private var dashboardBoolean: LoggedDashboardBoolean? = null
+  private var dashboardBoolean: LoggedNetworkBoolean? = null
   private val lastHasChangedValues = hashMapOf<Int, Boolean>()
 
   init {
     if (GlobalConstants.TUNING_MODE && !RobotContainer.isCompMatch()) {
-      dashboardBoolean = LoggedDashboardBoolean(key, defaultValue)
+      dashboardBoolean = LoggedNetworkBoolean(key, defaultValue)
     }
   }
 

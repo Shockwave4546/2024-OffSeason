@@ -1,16 +1,16 @@
 package org.shockwave.utils
 
-import org.littletonrobotics.junction.networktables.LoggedDashboardNumber
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber
 import org.shockwave.GlobalConstants
 import org.shockwave.RobotContainer
 
 class TunableNumber(key: String, private val defaultValue: Double = 0.0) {
-  private var dashboardNumber: LoggedDashboardNumber? = null
+  private var dashboardNumber: LoggedNetworkNumber? = null
   private val lastHasChangedValues = hashMapOf<Int, Double>()
 
   init {
     if (GlobalConstants.TUNING_MODE && !RobotContainer.isCompMatch()) {
-      dashboardNumber = LoggedDashboardNumber(key, defaultValue)
+      dashboardNumber = LoggedNetworkNumber(key, defaultValue)
     }
   }
 
