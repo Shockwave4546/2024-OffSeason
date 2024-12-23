@@ -12,9 +12,8 @@ class ModuleConstants {
     // This changes the drive speed of the module (a pinion gear with more teeth will result in a robot that drives faster).
     private const val DRIVE_MOTOR_PINION_TEETH = 13
 
-    private const val TURN_MOTOR_INVERTED = false
     private const val TURN_ENCODER_INVERTED = true // This must be true
-    private const val DRIVE_MOTOR_INVERTED = false
+    private const val DRIVE_MOTOR_INVERTED = true
 
     // Calculations required for driving motor conversion factors and feed forward
     private const val DRIVE_FREE_SPEED_RPS = MotorConstants.NEO_FREE_SPEED_RPM / 60
@@ -69,7 +68,6 @@ class ModuleConstants {
     }
 
     val TURN_CONFIG = SparkMaxConfig().apply {
-      inverted(TURN_MOTOR_INVERTED)
       idleMode(SparkBaseConfig.IdleMode.kBrake)
       smartCurrentLimit(MotorConstants.NEO_550_CURRENT_LIMIT)
       voltageCompensation(12.0)

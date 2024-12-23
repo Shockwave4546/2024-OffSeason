@@ -14,12 +14,8 @@ class GyroIONavX : GyroIO {
     inputs.yawPosition = Rotation2d.fromDegrees(-navX.angle)
     inputs.yawVelocityRadPerSec = Units.degreesToRadians((-navX.rawGyroZ).toDouble())
 
-    inputs.odometryYawTimestamps =
-      yawTimestampQueue.stream().mapToDouble { it }.toArray()
-    inputs.odometryYawPositions =
-      yawPositionQueue.stream()
-        .map { Rotation2d.fromDegrees(-it) }
-        .toArray { arrayOf() }
+    inputs.odometryYawTimestamps = yawTimestampQueue.map { it.toDouble() }.toDoubleArray()
+    inputs.odometryYawPositions = yawPositionQueue.map { Rotation2d.fromDegrees(-it) }.toTypedArray()
     yawTimestampQueue.clear()
     yawPositionQueue.clear()
   }

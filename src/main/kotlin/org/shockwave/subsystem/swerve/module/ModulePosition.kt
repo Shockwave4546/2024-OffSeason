@@ -14,10 +14,3 @@ enum class ModulePosition(val key: String, val positionOffset: Translation2d, va
   BACK_LEFT("BackLeft", Translation2d(-WHEEL_BASE / 2, TRACK_WIDTH / 2), Math.PI / 2),
   BACK_RIGHT("BackRight", Translation2d(-WHEEL_BASE / 2, -TRACK_WIDTH / 2), 0.0)
 }
-
-/**
- *       Translation2d(frc.robot.subsystems.drive.DriveConstants.trackWidth / 2.0, frc.robot.subsystems.drive.DriveConstants.wheelBase / 2.0),
- *       Translation2d(frc.robot.subsystems.drive.DriveConstants.trackWidth / 2.0, -frc.robot.subsystems.drive.DriveConstants.wheelBase / 2.0),
- *       Translation2d(-frc.robot.subsystems.drive.DriveConstants.trackWidth / 2.0, frc.robot.subsystems.drive.DriveConstants.wheelBase / 2.0),
- *       Translation2d(-frc.robot.subsystems.drive.DriveConstants.trackWidth / 2.0, -frc.robot.subsystems.drive.DriveConstants.wheelBase / 2.0)
- */

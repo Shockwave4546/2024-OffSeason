@@ -13,7 +13,7 @@ import org.shockwave.utils.ifOk
 import org.shockwave.utils.tryUntilOk
 import java.util.function.DoubleSupplier
 
-class ModuleIOSpark(position: ModulePosition) : ModuleIO {
+class ModuleIOSpark(private val position: ModulePosition) : ModuleIO {
   private val driveSpark = SparkMax(position.driveID, SparkLowLevel.MotorType.kBrushless)
   private val driveEncoder = driveSpark.encoder
   private val drivePID = driveSpark.closedLoopController
@@ -56,7 +56,7 @@ class ModuleIOSpark(position: ModulePosition) : ModuleIO {
     SPARK_STICKY_FAULT = false
     turnSpark.ifOk(
       { turnEncoder.position },
-      { value -> inputs.turnPosition = Rotation2d(value) })
+      { value -> inputs.turnPosition = Rotation2d(value).minus(Rotation2d.fromRadians(position.angleOffset)) })
     turnSpark.ifOk({ turnEncoder.velocity }, { inputs.turnVelocityRadPerSec = it })
     turnSpark.ifOk(
       arrayOf(DoubleSupplier { turnSpark.appliedOutput }, DoubleSupplier { turnSpark.busVoltage })
@@ -64,9 +64,9 @@ class ModuleIOSpark(position: ModulePosition) : ModuleIO {
     turnSpark.ifOk({ turnSpark.outputCurrent }, { inputs.turnCurrentAmps = it })
     inputs.turnConnected = turnConnectedDebounce.calculate(!SPARK_STICKY_FAULT)
 
-    inputs.odometryTimestamps = timestampQueue.stream().mapToDouble { it }.toArray()
-    inputs.odometryDrivePositionsMeters = drivePositionQueue.stream().mapToDouble { it }.toArray()
-    inputs.odometryTurnPositions = turnPositionQueue.stream().map { Rotation2d(it) }.toArray { arrayOf() }
+    inputs.odometryTimestamps = timestampQueue.map { it.toDouble() }.toDoubleArray()
+    inputs.odometryDrivePositionsMeters = drivePositionQueue.map { it.toDouble() }.toDoubleArray()
+    inputs.odometryTurnPositions = turnPositionQueue.map { Rotation2d(it).minus(Rotation2d.fromRadians(position.angleOffset)) }.toTypedArray()
     timestampQueue.clear()
     drivePositionQueue.clear()
     turnPositionQueue.clear()
@@ -87,7 +87,8 @@ class ModuleIOSpark(position: ModulePosition) : ModuleIO {
   }
 
   override fun setTurnPosition(rotation: Rotation2d) {
-    val setpoint = MathUtil.inputModulus(rotation.radians, ModuleConstants.TURN_PID_MIN_INPUT, ModuleConstants.TURN_PID_MAX_INPUT)
+    // Applies
+    val setpoint = MathUtil.inputModulus(rotation.plus(Rotation2d.fromRadians(position.angleOffset)).radians, ModuleConstants.TURN_PID_MIN_INPUT, ModuleConstants.TURN_PID_MAX_INPUT)
     turnPID.setReference(setpoint, SparkBase.ControlType.kPosition)
   }
 }

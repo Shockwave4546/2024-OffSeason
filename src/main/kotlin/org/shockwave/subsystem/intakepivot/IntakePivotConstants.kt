@@ -31,7 +31,8 @@ class IntakePivotConstants {
 
       absoluteEncoder
         .positionConversionFactor(ANGLE_CONVERSION_FACTOR)
-        .zeroOffset(ANGLE_OFFSET)
+        // Zero offset is in [0, 1)
+        .zeroOffset(ANGLE_OFFSET / ANGLE_CONVERSION_FACTOR)
         .inverted(ENCODER_INVERTED)
 
       closedLoop

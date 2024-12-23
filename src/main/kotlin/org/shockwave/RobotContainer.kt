@@ -4,6 +4,7 @@ import com.pathplanner.lib.auto.AutoBuilder
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.wpilibj.DriverStation
+import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser
@@ -14,7 +15,7 @@ object RobotContainer {
 
   private val driverController = CommandXboxController(GlobalConstants.DRIVER_CONTROLLER_PORT)
 
-  val autoChooser = LoggedDashboardChooser("Auto Choices", AutoBuilder.buildAutoChooser())
+  val autoChooser: LoggedDashboardChooser<Command>
 
   init {
     when (GlobalConstants.CURRENT_MODE) {
@@ -49,6 +50,8 @@ object RobotContainer {
         )
       }
     }
+
+    autoChooser = LoggedDashboardChooser("Auto Choices", AutoBuilder.buildAutoChooser())
 
 
     /// Implement for non comp match

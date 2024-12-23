@@ -33,7 +33,8 @@ class ShooterPivotConstants {
 
       absoluteEncoder
         .inverted(ENCODER_INVERTED)
-        .zeroOffset(ANGLE_OFFSET)
+        // Zero offset is in [0, 1)
+        .zeroOffset(ANGLE_OFFSET / ANGLE_CONVERSION_FACTOR)
         .positionConversionFactor(ANGLE_CONVERSION_FACTOR)
 
       closedLoop

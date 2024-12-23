@@ -88,6 +88,10 @@ class SwerveSubsystem(private val gyroIO: GyroIO, flModuleIO: ModuleIO, frModule
       Logger.recordOutput("SwerveStates/SetpointsOptimized", *arrayOf<SwerveModuleState>())
     }
 
+    Logger.recordOutput("SwerveStates/Measured", *getModuleStates())
+    Logger.recordOutput("Odometry/Robot", getPose())
+    Logger.recordOutput("SwerveChassisSpeeds/Measured", getChassisSpeeds())
+
     // Update odometry
     val sampleTimestamps = modules[0].getOdometryTimestamps() // All signals are sampled together
     val sampleCount = sampleTimestamps.size
@@ -145,30 +149,13 @@ class SwerveSubsystem(private val gyroIO: GyroIO, flModuleIO: ModuleIO, frModule
   fun stop() = runVelocity(ChassisSpeeds())
 
   /** Returns the module states (turn angles and drive velocities) for all of the modules.  */
-  @AutoLogOutput(key = "SwerveStates/Measured")
-  private fun getModuleStates(): Array<SwerveModuleState?> {
-    val states = arrayOfNulls<SwerveModuleState>(4)
-    for (i in 0..3) {
-      states[i] = modules[i].getState()
-    }
+  private fun getModuleStates() = modules.map { it.getState() }.toTypedArray()
 
-    Logger.recordOutput("SwerveStates/Measured", *states)
-    return states
-  }
-
-  private fun getModulePositions(): Array<SwerveModulePosition?> {
-    val states = arrayOfNulls<SwerveModulePosition>(4)
-    for (i in 0..3) {
-      states[i] = modules[i].getPosition()
-    }
-    return states
-  }
+  private fun getModulePositions() = modules.map { it.getPosition() }.toTypedArray()
 
   /** Returns the measured chassis speeds of the robot.  */
-  @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
-  private fun getChassisSpeeds() = SwerveConstants.DRIVE_KINEMATICS.toChassisSpeeds(getModuleStates())
+  private fun getChassisSpeeds() = SwerveConstants.DRIVE_KINEMATICS.toChassisSpeeds(*getModuleStates())
 
-  @AutoLogOutput(key = "Odometry/Robot")
   fun getPose() = poseEstimator.estimatedPosition
 
   fun getRotation() = getPose().rotation
@@ -216,10 +203,8 @@ class SwerveSubsystem(private val gyroIO: GyroIO, flModuleIO: ModuleIO, frModule
             linearVelocity.y * SwerveConstants.MAX_SPEED_METERS_PER_SECOND,
             omega * SwerveConstants.MAX_ANGULAR_SPEED_RAD_PER_SECOND
           )
-        val isFlipped = DriverStation.getAlliance().isPresent && DriverStation.getAlliance().get() == DriverStation.Alliance.Red
-        speeds.toRobotRelativeSpeeds(
-          if (isFlipped) swerve.getRotation().plus(Rotation2d(Math.PI)) else swerve.getRotation()
-        )
+
+        speeds.toRobotRelativeSpeeds(swerve.getRotation())
         swerve.runVelocity(speeds)
       },
       swerve
