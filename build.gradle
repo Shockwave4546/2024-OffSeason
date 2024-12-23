@@ -92,6 +92,11 @@ dependencies {
   annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
 }
 
+tasks.register('replayWatch', JavaExec) {
+  mainClass = "org.littletonrobotics.junction.ReplayWatch"
+  classpath = sourceSets.main.runtimeClasspath
+}
+
 // Simulation configuration (e.g. environment variables).
 wpi.sim.addGui().defaultEnabled = true
 wpi.sim.addDriverstation()
@@ -105,13 +110,6 @@ jar {
   manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
   duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
-
-tasks.register('checkAkitInstall', JavaExec) {
-  dependsOn "classes"
-  mainClass = "org.littletonrobotics.junction.CheckInstall"
-  classpath = sourceSets.main.runtimeClasspath
-}
-compileJava.finalizedBy checkAkitInstall
 
 // Configure jar and deploy tasks
 deployArtifact.jarTask = jar
