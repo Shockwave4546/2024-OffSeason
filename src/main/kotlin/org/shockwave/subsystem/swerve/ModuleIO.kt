@@ -25,13 +25,13 @@ interface ModuleIO {
     override fun toLog(table: LogTable) {
       table.put("(1) Drive Connected", driveConnected)
       table.put("(2) Drive Position", drivePosition)
-      table.put("(3) Drive Velocity (m/s)", driveVelocityMetersPerSec)
+      table.put("(3) Drive Velocity (mps)", driveVelocityMetersPerSec)
       table.put("(4) Drive Applied Volts", driveAppliedVolts)
       table.put("(5) Drive Current (A)", driveCurrentAmps)
 
       table.put("(6) Turn Connected", turnConnected)
       table.put("(7) Turn Position (rad)", turnPosition.radians)
-      table.put("(8) Turn Velocity (rad/s)", turnVelocityRadPerSec)
+      table.put("(8) Turn Velocity (rad per s)", turnVelocityRadPerSec)
       table.put("(9) Turn Applied Volts", turnAppliedVolts)
       table.put("(10) Turn Current (A)", turnCurrentAmps)
 
@@ -43,13 +43,13 @@ interface ModuleIO {
     override fun fromLog(table: LogTable) {
       driveConnected = table.get("(1) Drive Connected", driveConnected)
       drivePosition = table.get("(2) Drive Position", drivePosition)
-      driveVelocityMetersPerSec = table.get("(3) Drive Velocity (m/s)", driveVelocityMetersPerSec)
+      driveVelocityMetersPerSec = table.get("(3) Drive Velocity (mps)", driveVelocityMetersPerSec)
       driveAppliedVolts = table.get("(4) Drive Applied Volts", driveAppliedVolts)
       driveCurrentAmps = table.get("(5) Drive Current (A)", driveCurrentAmps)
 
       turnConnected = table.get("(6) Turn Connected", turnConnected)
       turnPosition = Rotation2d(table.get("(7) Turn Position (rad)", turnPosition.radians))
-      turnVelocityRadPerSec = table.get("(8) Turn Velocity (rad/s)", turnVelocityRadPerSec)
+      turnVelocityRadPerSec = table.get("(8) Turn Velocity (rad per s)", turnVelocityRadPerSec)
       turnAppliedVolts = table.get("(9) Turn Applied Volts", turnAppliedVolts)
       turnCurrentAmps = table.get("(10) Turn Current (A)", turnCurrentAmps)
 

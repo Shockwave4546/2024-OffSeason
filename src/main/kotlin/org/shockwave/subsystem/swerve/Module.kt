@@ -3,6 +3,7 @@ package org.shockwave.subsystem.swerve
 import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.math.kinematics.SwerveModulePosition
 import edu.wpi.first.math.kinematics.SwerveModuleState
+import edu.wpi.first.math.util.Units
 import edu.wpi.first.wpilibj.Alert
 import org.littletonrobotics.junction.Logger
 
@@ -41,8 +42,8 @@ class Module(private val io: ModuleIO, private val position: ModulePosition) : M
   }
 
   /** Runs the module with the specified output while controlling to zero degrees.  */
-  fun runCharacterization(output: Double) {
-    io.setDriveVoltage(output)
+  fun runCharacterization(voltage: Double) {
+    io.setDriveVoltage(voltage)
     io.setTurnPosition(Rotation2d())
   }
 
@@ -60,6 +61,11 @@ class Module(private val io: ModuleIO, private val position: ModulePosition) : M
 
   /** Returns the current drive velocity of the module in meters per second.  */
   fun getVelocityMetersPerSec() = inputs.driveVelocityMetersPerSec
+
+  /** Returns the current drive position of the module in rads */
+  fun getWheelRadiusCharacterizationPosition() = inputs.drivePosition / Units.inchesToMeters(1.5)
+
+  fun getFFCharacterizationVelocity() = inputs.driveVelocityMetersPerSec / Units.inchesToMeters(1.5)
 
   /** Returns the module position (turn angle and drive position).  */
   fun getPosition() = SwerveModulePosition(getPositionMeters(), getAngle())

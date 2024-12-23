@@ -53,6 +53,9 @@ object RobotContainer {
 
     autoChooser = LoggedDashboardChooser("Auto Choices", AutoBuilder.buildAutoChooser())
 
+    // Set up SysId routines
+    autoChooser.addOption("Swerve Wheel Radius Characterization", SwerveSubsystem.wheelRadiusCharacterization(swerve))
+    autoChooser.addOption("Swerve Simple FF Characterization", SwerveSubsystem.feedforwardCharacterization(swerve))
 
     /// Implement for non comp match
 //    // Set up SysId routines

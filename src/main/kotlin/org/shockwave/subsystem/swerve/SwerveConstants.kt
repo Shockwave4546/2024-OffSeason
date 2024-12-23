@@ -12,13 +12,13 @@ import kotlin.math.hypot
 class SwerveConstants {
   companion object {
     const val ODOMETRY_FREQUENCY = 100.0 // Hz
-    const val MAX_SPEED_METERS_PER_SECOND = 4.65
+    const val MAX_SPEED_METERS_PER_SECOND = 4.0
 
     // Distance between centers of right and left wheels on robot
     const val TRACK_WIDTH = 0.545 // m
     // Distance between front and back wheels on robot
     const val WHEEL_BASE = 0.545 // m
-    private val DRIVE_BASE_RADIUS = hypot(WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0)
+    val DRIVE_BASE_RADIUS = hypot(WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0)
     val MAX_ANGULAR_SPEED_RAD_PER_SECOND = MAX_SPEED_METERS_PER_SECOND / DRIVE_BASE_RADIUS
 
     // Drive Motor Can ID Format = 1x
