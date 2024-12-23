@@ -1,50 +1,105 @@
 package org.shockwave
 
+import com.pathplanner.lib.auto.AutoBuilder
+import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.wpilibj.DriverStation
-import edu.wpi.first.wpilibj2.command.InstantCommand
+import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
-import org.shockwave.subsystem.intake.IntakeIOSpark
-import org.shockwave.subsystem.intake.IntakeSubsystem
-import org.shockwave.subsystem.intakepivot.IntakePivotIOSpark
-import org.shockwave.subsystem.intakepivot.IntakePivotSubsystem
-import org.shockwave.subsystem.shooter.ShooterIOSpark
-import org.shockwave.subsystem.shooter.ShooterSubsystem
-import org.shockwave.subsystem.shooterpivot.ShooterPivotIOSpark
-import org.shockwave.subsystem.shooterpivot.ShooterPivotSubsystem
-import org.shockwave.subsystem.swerve.SwerveIOSpark
-import org.shockwave.subsystem.swerve.SwerveSubsystem
-import org.shockwave.subsystem.swerve.commands.ResetFieldCentricDriveCommand
-import org.shockwave.subsystem.swerve.commands.SetMaxSpeedCommand
-import org.shockwave.subsystem.swerve.gyro.GyroIONavX
-import org.shockwave.subsystem.vision.VisionIOReal
-import org.shockwave.subsystem.vision.VisionSubsystem
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser
+import org.shockwave.subsystem.swervenew.*
 
 object RobotContainer {
-  val swerve = SwerveSubsystem(SwerveIOSpark(), GyroIONavX())
-  val vision = VisionSubsystem(VisionIOReal(), swerve)
+  val swerve: SwerveSubsystem
 
-  val shooterPivot = ShooterPivotSubsystem(ShooterPivotIOSpark(), vision)
-  val intakePivot = IntakePivotSubsystem(IntakePivotIOSpark())
-  val shooter = ShooterSubsystem(ShooterIOSpark(), vision)
-  val intake = IntakeSubsystem(IntakeIOSpark())
-//  val led: LEDSubsystem?
+  private val driverController = CommandXboxController(GlobalConstants.DRIVER_CONTROLLER_PORT)
 
-  val driverController = CommandXboxController(GlobalConstants.DRIVER_CONTROLLER_PORT)
-  val operatorController = CommandXboxController(GlobalConstants.OPERATOR_CONTROLLER_PORT)
-//  val autoManager: AutoManager?
+  val autoChooser = LoggedDashboardChooser("Auto Choices", AutoBuilder.buildAutoChooser())
 
   init {
+    when (GlobalConstants.CURRENT_MODE) {
+      GlobalConstants.Companion.Mode.REAL -> {
+        swerve = SwerveSubsystem(
+          GyroIONavX(),
+          ModuleIOSpark(ModulePosition.FRONT_LEFT),
+          ModuleIOSpark(ModulePosition.FRONT_RIGHT),
+          ModuleIOSpark(ModulePosition.BACK_LEFT),
+          ModuleIOSpark(ModulePosition.BACK_RIGHT)
+        )
+      }
+
+      // TODO: implement ModuleIOSim
+      GlobalConstants.Companion.Mode.SIM -> {
+        swerve = SwerveSubsystem(
+          object : GyroIO {},
+          object : ModuleIO {},
+          object : ModuleIO {},
+          object : ModuleIO {},
+          object : ModuleIO {}
+        )
+      }
+
+      GlobalConstants.Companion.Mode.REPLAY -> {
+        swerve = SwerveSubsystem(
+          object : GyroIO {},
+          object : ModuleIO {},
+          object : ModuleIO {},
+          object : ModuleIO {},
+          object : ModuleIO {}
+        )
+      }
+    }
+
+
+    /// Implement for non comp match
+//    // Set up SysId routines
+//    autoChooser.addOption(
+//      "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive)
+//    )
+//    autoChooser.addOption(
+//      "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive)
+//    )
+//    autoChooser.addOption(
+//      "Drive SysId (Quasistatic Forward)",
+//      drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward)
+//    )
+//    autoChooser.addOption(
+//      "Drive SysId (Quasistatic Reverse)",
+//      drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse)
+//    )
+//    autoChooser.addOption(
+//      "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward)
+//    )
+//    autoChooser.addOption(
+//      "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse)
+//    )
+
     configureBindings()
 
     DriverStation.silenceJoystickConnectionWarning(true)
   }
 
   private fun configureBindings() {
-    driverController.a().onTrue(InstantCommand({ swerve.toggleAutoAlign() }))
-    driverController.b().onTrue(ResetFieldCentricDriveCommand(swerve, vision))
-    driverController.x().onTrue(InstantCommand({ swerve.toggleX() }, swerve))
-    driverController.leftBumper().whileTrue(SetMaxSpeedCommand(swerve, 0.2, 0.2))
-    driverController.rightBumper().whileTrue(SetMaxSpeedCommand(swerve, 0.4, 0.4))
+    swerve.defaultCommand = SwerveSubsystem.joystickDrive(
+      swerve,
+      { -driverController.leftY },
+      { -driverController.leftX },
+      { -driverController.rightX })
+
+    driverController.x().onTrue(Commands.runOnce(swerve::stopWithX, swerve))
+
+    driverController.b().onTrue(
+      Commands.runOnce(
+        { swerve.setPose(Pose2d(swerve.getPose().translation, Rotation2d())) },
+        swerve
+      ).ignoringDisable(true)
+    )
+
+//    driverController.a().onTrue(InstantCommand({ swerve.toggleAutoAlign() }))
+//    driverController.b().onTrue(ResetFieldCentricDriveCommand(swerve, vision))
+//    driverController.x().onTrue(InstantCommand({ swerve.toggleX() }, swerve))
+//    driverController.leftBumper().whileTrue(SetMaxSpeedCommand(swerve, 0.2, 0.2))
+//    driverController.rightBumper().whileTrue(SetMaxSpeedCommand(swerve, 0.4, 0.4))
 
 //    operatorController.povUp().onTrue(SetIntakeStateCommand(arm, ArmState.HOME))
 //    operatorController.povDown().onTrue(SetIntakeStateCommand(arm, ArmState.FLOOR))

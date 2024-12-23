@@ -2,13 +2,16 @@ package org.shockwave
 
 import edu.wpi.first.wpilibj.Alert
 import edu.wpi.first.wpilibj.PowerDistribution
+import edu.wpi.first.wpilibj.Threads
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj2.command.CommandScheduler
+import org.littletonrobotics.junction.LogFileUtil
 import org.littletonrobotics.junction.LoggedRobot
 import org.littletonrobotics.junction.Logger
 import org.littletonrobotics.junction.networktables.NT4Publisher
+import org.littletonrobotics.junction.wpilog.WPILOGReader
 import org.littletonrobotics.junction.wpilog.WPILOGWriter
-import org.shockwave.subsystem.swerve.commands.SwerveDriveCommand
+import org.littletonrobotics.urcl.URCL
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -20,8 +23,19 @@ object Robot : LoggedRobot() {
   private val garbageCollectorTimer = Timer()
 
   override fun robotInit() {
-    when (GlobalConstants.ROBOT_TYPE) {
-      RobotType.REAL -> {
+    Logger.recordMetadata("MavenGroup", MAVEN_GROUP)
+    Logger.recordMetadata("MavenName", MAVEN_NAME)
+    Logger.recordMetadata("BuildDate", BUILD_DATE)
+    Logger.recordMetadata("GitSHA", GIT_SHA)
+    Logger.recordMetadata("GitBranch", GIT_BRANCH)
+    when (DIRTY) {
+      0 -> Logger.recordMetadata("GitDirty", "All changes committed")
+      1 -> Logger.recordMetadata("GitDirty", "Uncommitted changes")
+      else -> Logger.recordMetadata("GitDirty", "Unknown")
+    }
+
+    when (GlobalConstants.CURRENT_MODE) {
+      GlobalConstants.Companion.Mode.REAL -> {
         Logger.addDataReceiver(NT4Publisher())
         PowerDistribution() // Enables power distribution logging.
 
@@ -35,29 +49,20 @@ object Robot : LoggedRobot() {
         }
       }
 
-      RobotType.SIM -> {
+      GlobalConstants.Companion.Mode.SIM -> {
         Logger.addDataReceiver(NT4Publisher())
+      }
+
+      GlobalConstants.Companion.Mode.REPLAY -> {
+        setUseTiming(false) // Run as fast as possible
+        val logPath = LogFileUtil.findReplayLog()
+        Logger.setReplaySource(WPILOGReader(logPath))
+        Logger.addDataReceiver(WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")))
       }
     }
 
-    Logger.recordMetadata("MavenGroup", MAVEN_GROUP)
-    Logger.recordMetadata("MavenName", MAVEN_NAME)
-    Logger.recordMetadata("BuildDate", BUILD_DATE)
-    Logger.recordMetadata("GitSHA", GIT_SHA)
-    Logger.recordMetadata("GitBranch", GIT_BRANCH)
-    when (DIRTY) {
-      0 -> Logger.recordMetadata("GitDirty", "All changes committed")
-      1 -> Logger.recordMetadata("GitDirty", "Uncommitted changes")
-      else -> Logger.recordMetadata("GitDirty", "Unknown")
-    }
-
+    Logger.registerURCL(URCL.startExternal())
     Logger.start()
-    RobotContainer.swerve.zeroGyro() // Reset field orientation drive.
-    RobotContainer.swerve.resetDriveEncoders()
-
-    CommandScheduler.getInstance().onCommandInitialize { command -> Logger.recordOutput("/ActiveCommands/${command.name}", true) }
-    CommandScheduler.getInstance().onCommandFinish { command -> Logger.recordOutput("/ActiveCommands/${command.name}", false) }
-    CommandScheduler.getInstance().onCommandInterrupt { command -> Logger.recordOutput("/ActiveCommands/${command.name}", false) }
 
     // Theoretically, this will never happen, but just in case...
     if (RobotContainer.isCompMatch() && GlobalConstants.TUNING_MODE) tuningModeAtComp.set(true)
@@ -65,22 +70,25 @@ object Robot : LoggedRobot() {
   }
 
   override fun robotPeriodic() {
+    // Switch thread to high priority to improve loop timing
+    Threads.setCurrentThreadPriority(true, 99)
+
     if (garbageCollectorTimer.advanceIfElapsed(5.0)) {
       System.gc()
     }
 
     CommandScheduler.getInstance().run()
+
+    // Return to normal thread priority
+    Threads.setCurrentThreadPriority(false, 10)
   }
 
   override fun disabledPeriodic() {
-//    RobotContainer.led!!.rainbow()
+
   }
 
   override fun autonomousInit() {
-    CommandScheduler.getInstance().removeDefaultCommand(RobotContainer.swerve)
-    RobotContainer.swerve.zeroGyro() // Reset field orientation drive.
-    RobotContainer.swerve.resetDriveEncoders()
-//    RobotContainer.autoManager!!.scheduleRoutine()
+    RobotContainer.autoChooser.get().schedule()
   }
 
   override fun autonomousPeriodic() {
@@ -88,11 +96,7 @@ object Robot : LoggedRobot() {
   }
 
   override fun teleopInit() {
-    RobotContainer.swerve.defaultCommand = SwerveDriveCommand(
-      RobotContainer.driverController,
-      RobotContainer.swerve,
-      RobotContainer.vision
-    )
+
   }
 
   override fun teleopPeriodic() {
