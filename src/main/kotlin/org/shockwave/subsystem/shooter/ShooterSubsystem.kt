@@ -3,10 +3,9 @@ package org.shockwave.subsystem.shooter
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import org.littletonrobotics.junction.Logger
-import org.shockwave.subsystem.vision.VisionSubsystem
 import org.shockwave.utils.TunablePIDF
 
-class ShooterSubsystem(private val shooter: ShooterIO, private val vision: VisionSubsystem) : SubsystemBase() {
+class ShooterSubsystem(private val shooter: ShooterIO) : SubsystemBase() {
   private val inputs = ShooterIO.ShooterIOInputs()
   private var desiredState = ShooterState.STOPPED
 
@@ -37,18 +36,18 @@ class ShooterSubsystem(private val shooter: ShooterIO, private val vision: Visio
 
   fun setDesiredState(state: ShooterState) {
     if (topPIDF.isManualMode() || botPIDF.isManualMode()) return
-
-    if (state === ShooterState.INTERPOLATED) {
-      val distance = vision.getToSpeaker().distance
-      if (distance.isEmpty) return
-      this.desiredState = ShooterState(
-        "Interpolated",
-        ShooterConstants.BOT_RPS_PREDICTOR.predict(distance.get()),
-        ShooterConstants.TOP_RPS_PREDICTOR.predict(distance.get())
-      )
-    } else {
-      this.desiredState = state
-    }
+//
+//    if (state === ShooterState.INTERPOLATED) {
+//      val distance = vision.getToSpeaker().distance
+//      if (distance.isEmpty) return
+//      this.desiredState = ShooterState(
+//        "Interpolated",
+//        ShooterConstants.BOT_RPS_PREDICTOR.predict(distance.get()),
+//        ShooterConstants.TOP_RPS_PREDICTOR.predict(distance.get())
+//      )
+//    } else {
+//      this.desiredState = state
+//    }
 
     val bottomClamped = MathUtil.clamp(desiredState.bottomRPS, ShooterConstants.MIN_RPS, ShooterConstants.MAX_RPS)
     val topClamped = MathUtil.clamp(desiredState.topRPS, ShooterConstants.MIN_RPS, ShooterConstants.MAX_RPS)

@@ -1,4 +1,4 @@
-package org.shockwave.subsystem.swervenew
+package org.shockwave.subsystem.swerve
 
 import com.revrobotics.spark.SparkBase
 import com.revrobotics.spark.SparkBase.PersistMode

@@ -1,4 +1,4 @@
-package org.shockwave.subsystem.swervenew
+package org.shockwave.subsystem.swerve
 
 import com.revrobotics.spark.config.ClosedLoopConfig
 import com.revrobotics.spark.config.SparkBaseConfig

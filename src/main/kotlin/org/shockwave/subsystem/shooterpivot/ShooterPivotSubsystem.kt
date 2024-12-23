@@ -3,11 +3,10 @@ package org.shockwave.subsystem.shooterpivot
 import edu.wpi.first.math.MathUtil
 import edu.wpi.first.wpilibj2.command.SubsystemBase
 import org.littletonrobotics.junction.Logger
-import org.shockwave.subsystem.vision.VisionSubsystem
 import org.shockwave.utils.TunableNumber
 import org.shockwave.utils.TunablePIDF
 
-class ShooterPivotSubsystem(private val pivot: ShooterPivotIO, private val vision: VisionSubsystem) : SubsystemBase() {
+class ShooterPivotSubsystem(private val pivot: ShooterPivotIO) : SubsystemBase() {
   private val inputs = ShooterPivotIO.ShooterPivotIOInputs()
   private var desiredState = ShooterPivotState.STARTING
 
@@ -44,13 +43,13 @@ class ShooterPivotSubsystem(private val pivot: ShooterPivotIO, private val visio
     if (pidf.isManualMode()) return
     if (shouldStopPivot()) return
 
-    if (state === ShooterPivotState.INTERPOLATED) {
-      val distance = vision.getToSpeaker().distance
-      if (distance.isEmpty) return
-      this.desiredState = ShooterPivotState("Interpolated", ShooterPivotConstants.ANGLE_PREDICTOR.predict(distance.get()))
-    } else {
-      this.desiredState = state
-    }
+//    if (state === ShooterPivotState.INTERPOLATED) {
+//      val distance = vision.getToSpeaker().distance
+//      if (distance.isEmpty) return
+//      this.desiredState = ShooterPivotState("Interpolated", ShooterPivotConstants.ANGLE_PREDICTOR.predict(distance.get()))
+//    } else {
+//      this.desiredState = state
+//    }
 
     val clamped = MathUtil.clamp(desiredState.angle, ShooterPivotConstants.MIN_ANGLE, ShooterPivotConstants.MAX_ANGLE)
     pivot.setAngleSetpoint(clamped)

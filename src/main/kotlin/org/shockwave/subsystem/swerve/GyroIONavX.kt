@@ -1,4 +1,4 @@
-package org.shockwave.subsystem.swervenew
+package org.shockwave.subsystem.swerve
 
 import com.studica.frc.AHRS
 import edu.wpi.first.math.geometry.Rotation2d

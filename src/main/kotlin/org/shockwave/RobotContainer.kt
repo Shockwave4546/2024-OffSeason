@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.Commands
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser
-import org.shockwave.subsystem.swervenew.*
+import org.shockwave.subsystem.swerve.*
 
 object RobotContainer {
   val swerve: SwerveSubsystem
