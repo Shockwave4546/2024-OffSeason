@@ -122,7 +122,7 @@ class SwerveSubsystem(private val gyroIO: GyroIO, flModuleIO: ModuleIO, frModule
 
   fun runVelocity(speeds: ChassisSpeeds) {
     // Calculate module setpoints
-    speeds.discretize(0.02)
+    ChassisSpeeds.discretize(speeds, 0.2)
     val setpointStates: Array<SwerveModuleState> = SwerveConstants.DRIVE_KINEMATICS.toSwerveModuleStates(speeds)
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, SwerveConstants.MAX_SPEED_METERS_PER_SECOND)
 
@@ -351,7 +351,13 @@ class SwerveSubsystem(private val gyroIO: GyroIO, flModuleIO: ModuleIO, frModule
             omega * SwerveConstants.MAX_ANGULAR_SPEED_RAD_PER_SECOND
           )
 
-        speeds.toRobotRelativeSpeeds(swerve.getRotation())
+        val isFlipped = DriverStation.getAlliance().isPresent && DriverStation.getAlliance().get() == DriverStation.Alliance.Red
+        swerve.runVelocity(
+          ChassisSpeeds.fromFieldRelativeSpeeds(
+            speeds,
+            if (isFlipped) swerve.getRotation().plus(Rotation2d(Math.PI)) else swerve.getRotation()
+          )
+        )
         swerve.runVelocity(speeds)
       },
       swerve
