@@ -45,8 +45,8 @@ class ModuleIOSpark(private val position: ModulePosition) : ModuleIO {
 
   override fun updateInputs(inputs: ModuleIO.ModuleIOInputs) {
     SPARK_STICKY_FAULT = false
-    driveSpark.ifOk(driveEncoder::getPosition) { inputs.drivePosition = it }
-    driveSpark.ifOk(driveEncoder::getVelocity) { inputs.driveVelocityMetersPerSec = it }
+    driveSpark.ifOk(driveEncoder::getPosition) { inputs.drivePositionRads = it }
+    driveSpark.ifOk(driveEncoder::getVelocity) { inputs.driveVelocityRadsPerSec = it }
     driveSpark.ifOk(
       arrayOf(DoubleSupplier { driveSpark.appliedOutput }, DoubleSupplier { driveSpark.busVoltage })
     ) { values -> inputs.driveAppliedVolts = values[0] * values[1] }

@@ -24,8 +24,8 @@ class ModuleConstants {
     const val DRIVE_MOTOR_REDUCTION = (45.0 * 22) / (DRIVE_MOTOR_PINION_TEETH * 15)
     private const val DRIVE_WHEEL_FREE_SPEED_RPS = ((DRIVE_FREE_SPEED_RPS * WHEEL_CIRCUMFERENCE) / DRIVE_MOTOR_REDUCTION)
 
-    private const val DRIVE_POSITION_FACTOR = (WHEEL_DIAMETER * Math.PI) / DRIVE_MOTOR_REDUCTION // m
-    private const val DRIVE_VELOCITY_FACTOR = ((WHEEL_DIAMETER * Math.PI) / DRIVE_MOTOR_REDUCTION) / 60.0 // m/s
+    private const val DRIVE_POSITION_FACTOR = (2 * Math.PI) / DRIVE_MOTOR_REDUCTION // m
+    private const val DRIVE_VELOCITY_FACTOR = ((2 * Math.PI) / DRIVE_MOTOR_REDUCTION) / 60.0 // m/s
 
     private const val TURN_POSITION_FACTOR = 2 * Math.PI // rad
     private const val TURN_VELOCITY_FACTOR = (2 * Math.PI) / 60.0 // rad/s
@@ -33,7 +33,7 @@ class ModuleConstants {
     const val TURN_PID_MIN_INPUT = 0.0 // rad
     const val TURN_PID_MAX_INPUT = 2 * Math.PI // rad
 
-    val DRIVE_PIDF = PIDFGains(0.15, 0.0, 0.02, 1 / DRIVE_WHEEL_FREE_SPEED_RPS)
+    val DRIVE_PIDF = PIDFGains(0.01, 0.0, 0.246, 0.005)
     private const val DRIVE_MIN_OUTPUT = -1.0
     private const val DRIVE_MAX_OUTPUT = 1.0
 

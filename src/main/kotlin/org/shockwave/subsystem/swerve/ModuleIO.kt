@@ -7,8 +7,8 @@ import org.littletonrobotics.junction.inputs.LoggableInputs
 interface ModuleIO {
   class ModuleIOInputs : LoggableInputs {
     var driveConnected = false
-    var drivePosition = 0.0
-    var driveVelocityMetersPerSec = 0.0
+    var drivePositionRads = 0.0
+    var driveVelocityRadsPerSec = 0.0
     var driveAppliedVolts = 0.0
     var driveCurrentAmps = 0.0
 
@@ -24,8 +24,8 @@ interface ModuleIO {
 
     override fun toLog(table: LogTable) {
       table.put("(1) Drive Connected", driveConnected)
-      table.put("(2) Drive Position", drivePosition)
-      table.put("(3) Drive Velocity (mps)", driveVelocityMetersPerSec)
+      table.put("(2) Drive Position", drivePositionRads)
+      table.put("(3) Drive Velocity (mps)", driveVelocityRadsPerSec)
       table.put("(4) Drive Applied Volts", driveAppliedVolts)
       table.put("(5) Drive Current (A)", driveCurrentAmps)
 
@@ -42,8 +42,8 @@ interface ModuleIO {
 
     override fun fromLog(table: LogTable) {
       driveConnected = table.get("(1) Drive Connected", driveConnected)
-      drivePosition = table.get("(2) Drive Position", drivePosition)
-      driveVelocityMetersPerSec = table.get("(3) Drive Velocity (mps)", driveVelocityMetersPerSec)
+      drivePositionRads = table.get("(2) Drive Position", drivePositionRads)
+      driveVelocityRadsPerSec = table.get("(3) Drive Velocity (mps)", driveVelocityRadsPerSec)
       driveAppliedVolts = table.get("(4) Drive Applied Volts", driveAppliedVolts)
       driveCurrentAmps = table.get("(5) Drive Current (A)", driveCurrentAmps)
 

@@ -21,7 +21,7 @@ class Module(private val io: ModuleIO, private val position: ModulePosition) : M
     val sampleCount = inputs.odometryTimestamps.size // All signals are sampled together
     odometryPositions = Array(sampleCount) { SwerveModulePosition() }
     for (i in 0..<sampleCount) {
-      val positionMeters = inputs.odometryDrivePositionsMeters[i]
+      val positionMeters = inputs.odometryDrivePositionsMeters[i] * Units.inchesToMeters(1.5)
       val angle = inputs.odometryTurnPositions[i]
       odometryPositions[i] = SwerveModulePosition(positionMeters, angle)
     }
@@ -37,7 +37,7 @@ class Module(private val io: ModuleIO, private val position: ModulePosition) : M
     state.cosineScale(inputs.turnPosition)
 
     // Apply setpoints
-    io.setDriveVelocity(state.speedMetersPerSecond)
+    io.setDriveVelocity(state.speedMetersPerSecond / Units.inchesToMeters(1.5))
     io.setTurnPosition(state.angle)
   }
 
@@ -57,15 +57,15 @@ class Module(private val io: ModuleIO, private val position: ModulePosition) : M
   fun getAngle() = inputs.turnPosition
 
   /** Returns the current drive position of the module in meters.  */
-  fun getPositionMeters() = inputs.drivePosition
+  fun getPositionMeters() = inputs.drivePositionRads * Units.inchesToMeters(1.5);
 
   /** Returns the current drive velocity of the module in meters per second.  */
-  fun getVelocityMetersPerSec() = inputs.driveVelocityMetersPerSec
+  fun getVelocityMetersPerSec() = inputs.driveVelocityRadsPerSec * Units.inchesToMeters(1.5);
 
   /** Returns the current drive position of the module in rads */
-  fun getWheelRadiusCharacterizationPosition() = inputs.drivePosition / Units.inchesToMeters(1.5)
+  fun getWheelRadiusCharacterizationPosition() = inputs.drivePositionRads
 
-  fun getFFCharacterizationVelocity() = inputs.driveVelocityMetersPerSec / Units.inchesToMeters(1.5)
+  fun getFFCharacterizationVelocity() = inputs.driveVelocityRadsPerSec
 
   /** Returns the module position (turn angle and drive position).  */
   fun getPosition() = SwerveModulePosition(getPositionMeters(), getAngle())
