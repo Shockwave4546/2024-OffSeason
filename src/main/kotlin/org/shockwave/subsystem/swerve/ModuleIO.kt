@@ -7,7 +7,7 @@ import org.littletonrobotics.junction.inputs.LoggableInputs
 interface ModuleIO {
   class ModuleIOInputs : LoggableInputs {
     var driveConnected = false
-    var drivePositionRad = 0.0
+    var drivePosition = 0.0
     var driveVelocityMetersPerSec = 0.0
     var driveAppliedVolts = 0.0
     var driveCurrentAmps = 0.0
