@@ -34,12 +34,12 @@ class ModuleIOSpark(private val position: ModulePosition) : ModuleIO {
       it.configure(ModuleConstants.DRIVE_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters)
     }
 
-    turnSpark.tryUntilOk(5) {
-      it.configure(ModuleConstants.TURN_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters)
+    driveSpark.tryUntilOk(5) {
+      it.encoder.setPosition(0.0)
     }
 
     turnSpark.tryUntilOk(5) {
-      it.encoder.setPosition(0.0)
+      it.configure(ModuleConstants.TURN_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters)
     }
   }
 
